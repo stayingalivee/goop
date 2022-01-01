@@ -51,6 +51,7 @@ func (self *Scanner) scanToken() {
         case ' ':
         case '\t':
         case '\r':
+        case '"': self.handleString()
         case '\n': line++
         default: println("illegal char")
     }
@@ -104,4 +105,20 @@ func (self * Scanner) matchNext(expected byte) bool {
 
 func (self *Scanner) peek() byte{
     return self.SourceCode[current]
+}
+
+func (self *Scanner) handleString() {
+    for self.peek() != '"' && !self.isAtEnd() {
+        if self.peek() == '\n' {
+            line++
+        }
+        self.next()
+    }
+
+    if self.isAtEnd() {
+        print("Error: Unterminated String")
+    }
+    self.next()
+    literal := self.SourceCode[start + 1: current - 1]
+    self.addToken(STRING, literal)
 }

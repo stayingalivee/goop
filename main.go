@@ -30,7 +30,7 @@ func readSource(sourceCodePath string) {
 
     tokens := scnr.ScanTokens()
     for _, token := range tokens {
-        print(token.ToString() + ", ")
+        println(token.ToString())
     }
 }
 

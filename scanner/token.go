@@ -8,5 +8,7 @@ type Token struct {
 }
 
 func (self *Token) ToString() string {
-    return self.tokenType.String()
+    return "type: " + self.tokenType.String() +
+           ", lexeme: " + self.lexeme +
+           ", literal " + self.literal
 }
