@@ -12,7 +12,6 @@ type Scanner struct {
 }
 
 func (self *Scanner) ScanTokens() []Token {
-
     for !self.isAtEnd() {
         start = current;
         self.scanToken()
@@ -24,12 +23,8 @@ func (self *Scanner) ScanTokens() []Token {
     return self.tokens
 }
 
-
-
 func (self *Scanner) scanToken() {
-    c := self.SourceCode[current]
-    current++
-
+    c := self.next()
     switch c {
         case '(': self.addToken(LEFT_PAREN)
         case ')': self.addToken(RIGHT_PAREN)
@@ -41,7 +36,23 @@ func (self *Scanner) scanToken() {
         case '+': self.addToken(PLUS)
         case ';': self.addToken(SEMICOLON)
         case '*': self.addToken(STAR)
-        case '\n' : line++
+        case '!': self.addTokenOnCondition(self.matchNext('='), BANG_EQUAL, BANG)
+        case '=': self.addTokenOnCondition(self.matchNext('='), EQUAL_EQUAL, EQUAL)
+        case '>': self.addTokenOnCondition(self.matchNext('='), GREATER_EQUAL, GREATER)
+        case '<': self.addTokenOnCondition(self.matchNext('='), LESS_EQUAL, LESS)
+        case '/':
+            if self.matchNext('/') {
+                for self.peek() != '\n' && !self.isAtEnd() {
+                    self.next()
+                }
+            } else {
+                self.addToken(SLASH)
+            }
+        case ' ':
+        case '\t':
+        case '\r':
+        case '\n': line++
+        default: println("illegal char")
     }
 }
 
@@ -62,7 +73,35 @@ func (self *Scanner) addToken(params ...interface{}) {
     self.tokens = append(self.tokens, token)
 }
 
+func (self *Scanner) addTokenOnCondition(
+    condition bool, ifTrue TokenType, ifFalse TokenType) {
+    if condition {
+        self.addToken(ifTrue)
+    } else {
+        self.addToken(ifFalse)
+    }
+}
+
 func (self *Scanner) isAtEnd() bool {
     return current >= len(self.SourceCode)
 }
 
+func (self *Scanner) next() byte {
+    current++;
+    return self.SourceCode[current - 1]
+}
+
+func (self * Scanner) matchNext(expected byte) bool {
+    if self.isAtEnd() {
+        return false
+    }
+    if(self.SourceCode[current] != expected) {
+        return false
+    }
+    current++
+    return true
+}
+
+func (self *Scanner) peek() byte{
+    return self.SourceCode[current]
+}
