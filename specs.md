@@ -55,4 +55,4 @@ bare minimunm specs
 ## std lib
 
 - clock()
-- TODO
+- TODO (starting from v0.2)

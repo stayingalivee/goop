@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
+    "fmt"
 	"io/ioutil"
-	"os"
+    "os"
+    "goop/scanner"
 )
 
 func main() {
@@ -17,11 +18,19 @@ func run(source string) {
     // TODO: implement compiler lmao
 }
 
-func readSource(programPath string) {
-    content, err := ioutil.ReadFile(programPath)
+func readSource(sourceCodePath string) {
+    content, err := ioutil.ReadFile(sourceCodePath)
     if err != nil {
         fmt.Println(err)
     }
-    fmt.Println(string(content))
+
+    scnr := scanner.Scanner{
+        SourceCode: string(content),
+    }
+
+    tokens := scnr.ScanTokens()
+    for _, token := range tokens {
+        print(token.ToString() + ", ")
+    }
 }
 
