@@ -1,5 +1,7 @@
 package scanner
 
+import "os"
+
 const indentifierPattern string = "[a-zA-Z_][a-zA-Z_0-9]*"
 
 var start = 0
@@ -25,22 +27,27 @@ func (self *Scanner) ScanTokens() []Token {
 
 func (self *Scanner) scanToken() {
     c := self.next()
-    switch c {
-        case '(': self.addToken(LEFT_PAREN)
-        case ')': self.addToken(RIGHT_PAREN)
-        case '{': self.addToken(LEFT_BRACE)
-        case '}': self.addToken(RIGHT_BRACE)
-        case ',': self.addToken(COMMA)
-        case '.': self.addToken(DOT)
-        case '-': self.addToken(MINUS)
-        case '+': self.addToken(PLUS)
-        case ';': self.addToken(SEMICOLON)
-        case '*': self.addToken(STAR)
-        case '!': self.addTokenOnCondition(self.matchNext('='), BANG_EQUAL, BANG)
-        case '=': self.addTokenOnCondition(self.matchNext('='), EQUAL_EQUAL, EQUAL)
-        case '>': self.addTokenOnCondition(self.matchNext('='), GREATER_EQUAL, GREATER)
-        case '<': self.addTokenOnCondition(self.matchNext('='), LESS_EQUAL, LESS)
-        case '/':
+    switch  {
+        case c == '(': self.addToken(LEFT_PAREN)
+        case c == ')': self.addToken(RIGHT_PAREN)
+        case c == '{': self.addToken(LEFT_BRACE)
+        case c == '}': self.addToken(RIGHT_BRACE)
+        case c == ',': self.addToken(COMMA)
+        case c == '.':
+            if self.isNumeric(self.peek()) {
+                self.handleNumber()
+            } else {
+                self.addToken(DOT)
+            }
+        case c == '-': self.addToken(MINUS)
+        case c == '+': self.addToken(PLUS)
+        case c == ';': self.addToken(SEMICOLON)
+        case c == '*': self.addToken(STAR)
+        case c == '!': self.addTokenOnCondition(self.matchNext('='), BANG_EQUAL, BANG)
+        case c == '=': self.addTokenOnCondition(self.matchNext('='), EQUAL_EQUAL, EQUAL)
+        case c == '>': self.addTokenOnCondition(self.matchNext('='), GREATER_EQUAL, GREATER)
+        case c == '<': self.addTokenOnCondition(self.matchNext('='), LESS_EQUAL, LESS)
+        case c == '/':
             if self.matchNext('/') {
                 for self.peek() != '\n' && !self.isAtEnd() {
                     self.next()
@@ -48,11 +55,14 @@ func (self *Scanner) scanToken() {
             } else {
                 self.addToken(SLASH)
             }
-        case ' ':
-        case '\t':
-        case '\r':
-        case '"': self.handleString()
-        case '\n': line++
+        case c == ' ':
+        case c == '\t':
+        case c == '\r':
+        case c == '\n': line++
+
+        case c == '"': self.handleString()
+        case self.isNumeric(c): self.handleNumber()
+
         default: println("illegal char")
     }
 }
@@ -121,4 +131,25 @@ func (self *Scanner) handleString() {
     self.next()
     literal := self.SourceCode[start + 1: current - 1]
     self.addToken(STRING, literal)
+}
+
+var dotCount = 0;
+func (self *Scanner) isNumeric(c byte) bool {
+    if c == '.' {
+        dotCount++
+    }
+    if dotCount > 1 {
+        print("Error: illegal number format")
+        os.Exit(64)
+    }
+    return (c >= '0' && c <= '9') || c == '.'
+}
+
+func (self *Scanner) handleNumber() {
+    for self.isNumeric(self.peek()) && !self.isAtEnd() {
+        self.next()
+    }
+    dotCount = 0
+    literal := self.SourceCode[start: current]
+    self.addToken(NUMBER, literal)
 }
