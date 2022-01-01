@@ -146,6 +146,7 @@ func (self *Scanner) isNumeric(c byte) bool {
 }
 
 func (self *Scanner) handleNumber() {
+    // TODO : prevent consuming DOT if the next char is not numeric
     for self.isNumeric(self.peek()) && !self.isAtEnd() {
         self.next()
     }
