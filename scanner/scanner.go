@@ -168,7 +168,15 @@ func (self *Scanner) handleIdentifier() {
     for self.isAlphaNumeric(self.peek()) {
         self.next()
     }
-    self.addToken(IDENTIFIER)
+    lexeme := self.SourceCode[start: current]
+
+    // check if reserved keyword
+    tokenType, exists := keywords[lexeme]
+    if exists {
+        self.addToken(tokenType)
+    } else {
+        self.addToken(IDENTIFIER)
+    }
 }
 
 func (self *Scanner) isAlpha(c byte) bool {
@@ -180,5 +188,3 @@ func (self *Scanner) isAlpha(c byte) bool {
 func (self *Scanner) isAlphaNumeric(c byte) bool {
     return self.isAlpha(c) || self.isNumeric(c)
 }
-
-
