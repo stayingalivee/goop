@@ -188,3 +188,4 @@ func (self *Scanner) isAlpha(c byte) bool {
 func (self *Scanner) isAlphaNumeric(c byte) bool {
     return self.isAlpha(c) || self.isNumeric(c)
 }
+
