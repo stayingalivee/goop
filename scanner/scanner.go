@@ -2,8 +2,6 @@ package scanner
 
 import "os"
 
-const indentifierPattern string = "[a-zA-Z_][a-zA-Z_0-9]*"
-
 var start = 0
 var current = 0
 var line = 1
@@ -18,10 +16,8 @@ func (self *Scanner) ScanTokens() []Token {
         start = current;
         self.scanToken()
     }
-
     EOFToken := Token{EOF, "", "", line}
     self.tokens = append(self.tokens, EOFToken)
-
     return self.tokens
 }
 
@@ -33,12 +29,6 @@ func (self *Scanner) scanToken() {
         case c == '{': self.addToken(LEFT_BRACE)
         case c == '}': self.addToken(RIGHT_BRACE)
         case c == ',': self.addToken(COMMA)
-        case c == '.':
-            if self.isNumeric(self.peek()) {
-                self.handleNumber()
-            } else {
-                self.addToken(DOT)
-            }
         case c == '-': self.addToken(MINUS)
         case c == '+': self.addToken(PLUS)
         case c == ';': self.addToken(SEMICOLON)
@@ -47,6 +37,16 @@ func (self *Scanner) scanToken() {
         case c == '=': self.addTokenOnCondition(self.matchNext('='), EQUAL_EQUAL, EQUAL)
         case c == '>': self.addTokenOnCondition(self.matchNext('='), GREATER_EQUAL, GREATER)
         case c == '<': self.addTokenOnCondition(self.matchNext('='), LESS_EQUAL, LESS)
+        case c == ' ':  // ignore all whitespaces 
+        case c == '\t':
+        case c == '\r':
+        case c == '\n': line++
+        case c == '.':
+            if self.isNumeric(self.peek()) {
+                self.handleNumber()
+            } else {
+                self.addToken(DOT)
+            }
         case c == '/':
             if self.matchNext('/') {
                 for self.peek() != '\n' && !self.isAtEnd() {
@@ -55,15 +55,25 @@ func (self *Scanner) scanToken() {
             } else {
                 self.addToken(SLASH)
             }
-        case c == ' ':
-        case c == '\t':
-        case c == '\r':
-        case c == '\n': line++
-
+        case c == '|':
+            if self.matchNext('|') {
+                self.addToken(OR)
+            }
+        case c== '&':
+            if self.matchNext('&') {
+                self.addToken(AND)
+            }
         case c == '"': self.handleString()
         case self.isNumeric(c): self.handleNumber()
 
-        default: println("illegal char")
+        default:
+            if self.isNumeric(c) {
+                self.handleNumber()
+            } else if self.isAlpha(c) {
+                self.handleIdentifier()
+            } else {
+                print("Illegal syntax")
+            }
     }
 }
 
@@ -146,7 +156,6 @@ func (self *Scanner) isNumeric(c byte) bool {
 }
 
 func (self *Scanner) handleNumber() {
-    // TODO : prevent consuming DOT if the next char is not numeric
     for self.isNumeric(self.peek()) && !self.isAtEnd() {
         self.next()
     }
@@ -154,3 +163,22 @@ func (self *Scanner) handleNumber() {
     literal := self.SourceCode[start: current]
     self.addToken(NUMBER, literal)
 }
+
+func (self *Scanner) handleIdentifier() {
+    for self.isAlphaNumeric(self.peek()) {
+        self.next()
+    }
+    self.addToken(IDENTIFIER)
+}
+
+func (self *Scanner) isAlpha(c byte) bool {
+    return (c >= 'a' && c <= 'z') ||
+           (c >= 'A' && c <= 'Z') ||
+            c == '_'
+}
+
+func (self *Scanner) isAlphaNumeric(c byte) bool {
+    return self.isAlpha(c) || self.isNumeric(c)
+}
+
+
