@@ -86,10 +86,10 @@ func (self *Scanner) addToken(params ...interface{}) {
     }
 
     token := Token{
-        tokenType: tokenType,
-        lexeme: self.SourceCode[start:current],
-        literal: literal,
-        line: line,
+        TokenType: tokenType,
+        Lexeme: self.SourceCode[start:current],
+        Literal: literal,
+        Line: line,
     }
     self.tokens = append(self.tokens, token)
 }

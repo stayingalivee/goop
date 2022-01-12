@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
     "os"
     "goop/scanner"
+    "goop/grammar"
 )
 
 func main() {
@@ -21,6 +22,9 @@ func run(sourcePath string) {
     tokens := scnr.ScanTokens()
 
     printDebug(tokens)
+
+    head := getTree()
+    printAstTree(head)
 }
 
 func readSource(sourceCodePath string) []byte {
@@ -32,7 +36,40 @@ func readSource(sourceCodePath string) []byte {
 }
 
 func printDebug(tokens []scanner.Token) {
+    println("tokenization..")
     for _, token := range tokens {
         println(token.ToString())
     }
 }
+
+func printAstTree(node interface{}) {
+    println("printing ast")
+    tree := ""
+    grammar.PrintTree(node, &tree)
+    println(tree)
+}
+
+func getTree() *grammar.Expr {
+    unary := &grammar.Unary{
+        Token: &scanner.Token{scanner.MINUS, "-", "", 1},
+        Expr: &grammar.Expr{
+                Literal: &grammar.Literal{
+                    &scanner.Token{scanner.NUMBER, "123", "", 1},
+                },
+        },
+    }
+
+    star := &grammar.Operator{&scanner.Token{scanner.STAR, "*", "", 1}}
+
+    grouping := &grammar.Grouping{
+        RightParan: &scanner.Token{scanner.RIGHT_PAREN, "(", "", 1},
+        Expr: &grammar.Expr{
+            Literal: &grammar.Literal{&scanner.Token{scanner.NUMBER, "13.21", "", 1}},
+        },
+        LeftParan: &scanner.Token{scanner.LEFT_PAREN, ")", "", 1},
+    }
+
+    binary := &grammar.Binary{&grammar.Expr{Unary: unary}, star, &grammar.Expr{Grouping: grouping}}
+    return &grammar.Expr{Binary: binary}
+}
+
