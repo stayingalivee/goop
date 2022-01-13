@@ -47,3 +47,21 @@ type Operator struct{
     Token       *scanner.Token
 }
 
+func BuildLiteralExpr(token *scanner.Token) *Expr {
+    return &Expr{Literal: &Literal{token}}
+}
+
+func BuildUnaryExpr(token *scanner.Token, expr *Expr) *Expr {
+    return &Expr{Unary: &Unary{token, expr}}
+}
+
+func BuildBinaryExpr(left *Expr, operator *Operator, right *Expr) *Expr {
+    return &Expr{Binary: &Binary{left, operator, right}}
+}
+
+func BuildGroupingExpr(expr *Expr, line int) *Expr {
+    rightParan := &scanner.Token{scanner.RIGHT_PAREN, "(", "", line}
+    leftParan  := &scanner.Token{scanner.LEFT_PAREN, ")", "", line}
+    return &Expr{Grouping: &Grouping{rightParan, expr, leftParan}}
+}
+
