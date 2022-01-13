@@ -12,7 +12,3 @@ and also wanted to have my own programming language to expirement with
 
 generate before compile
 
-```bash
-go generate ./...
-go run main.go source_code.goop
-```
