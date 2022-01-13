@@ -52,16 +52,15 @@ func printAstTree(node interface{}) {
 func getTree() *grammar.Expr {
 
     literalExpr := grammar.BuildLiteralExpr(
-        &scanner.Token{scanner.NUMBER, "123", "", 1})
-
+        scanner.NewToken(scanner.NUMBER, "123", "", 1))
     unaryExpr := grammar.BuildUnaryExpr(
-        &scanner.Token{scanner.MINUS, "-", "", 1},
+        scanner.NewToken(scanner.MINUS, "-", "", 1),
         literalExpr,
     )
 
-    star := &grammar.Operator{&scanner.Token{scanner.STAR, "*", "", 1}}
+    star := grammar.NewOperator(scanner.NewToken(scanner.STAR, "*", "", 1))
 
-    groupedExpr := grammar.BuildLiteralExpr(&scanner.Token{scanner.NUMBER, "13.21", "", 1})
+    groupedExpr := grammar.BuildLiteralExpr(scanner.NewToken(scanner.NUMBER, "13.21", "", 1))
     grouping := grammar.BuildGroupingExpr(groupedExpr, 1)
 
     binary := grammar.BuildBinaryExpr(unaryExpr, star, grouping)

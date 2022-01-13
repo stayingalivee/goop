@@ -60,8 +60,11 @@ func BuildBinaryExpr(left *Expr, operator *Operator, right *Expr) *Expr {
 }
 
 func BuildGroupingExpr(expr *Expr, line int) *Expr {
-    rightParan := &scanner.Token{scanner.RIGHT_PAREN, "(", "", line}
-    leftParan  := &scanner.Token{scanner.LEFT_PAREN, ")", "", line}
+    rightParan := scanner.NewToken(scanner.RIGHT_PAREN, "(", "", line)
+    leftParan  := scanner.NewToken(scanner.LEFT_PAREN, ")", "", line)
     return &Expr{Grouping: &Grouping{rightParan, expr, leftParan}}
 }
 
+func NewOperator(token *scanner.Token) *Operator {
+    return &Operator{Token: token}
+}
