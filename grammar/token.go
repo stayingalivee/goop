@@ -1,4 +1,4 @@
-package scanner
+package grammar
 
 type Token struct {
     TokenType   TokenType

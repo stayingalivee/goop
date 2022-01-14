@@ -64,6 +64,7 @@ func getTree() *grammar.Expr {
     grouping := grammar.BuildGroupingExpr(groupedExpr, 1)
 
     binary := grammar.BuildBinaryExpr(unaryExpr, star, grouping)
+    //                                  -123      *     (13.21)
 
     return binary
 }

@@ -1,12 +1,10 @@
 package grammar
 
-
-
 func PrintTree(node interface{}, tree *string) {
 
     switch node.(type) {
 
-    case *Literal:
+        case *Literal:
             *tree += node.(*Literal).Token.Lexeme
             return
 
