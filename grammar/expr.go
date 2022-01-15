@@ -58,6 +58,7 @@ func (self *Parser) previous() *Token {
 }
 
 func (self *Parser) next() *Token {
+    // look ahead by 1
     if !self.isAtEnd() {
         self.index++
     }
@@ -71,6 +72,7 @@ func (self *Parser) isAtEnd() bool {
 func (self *Parser) peek() Token {
     return self.tokenList[self.index]
 }
+
 
 // --------------------------
 // parser grammar rules impl
@@ -164,7 +166,7 @@ func (self *Parser) Primary() *Expr {
 }
 
 // ---------------------------------------------------
-// code after parsing bill be a tree of below structs
+// code after parsing will be a tree of below structs
 // ---------------------------------------------------
 type Expr struct{
     Literal     *Literal
