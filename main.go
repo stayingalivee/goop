@@ -21,10 +21,13 @@ func run(sourcePath string) {
     scnr := scanner.Scanner{SourceCode: string(content)}
     tokens := scnr.ScanTokens()
 
+    println("token scanning ...")
     printDebug(tokens)
 
-    head := getTree()
-    printAstTree(head)
+    println("parsing...")
+    parser := grammar.NewParser(tokens)
+    tree := parser.Parse()
+    printAstTree(tree)
 }
 
 func readSource(sourceCodePath string) []byte {
@@ -35,7 +38,7 @@ func readSource(sourceCodePath string) []byte {
     return content
 }
 
-func printDebug(tokens []scanner.Token) {
+func printDebug(tokens []grammar.Token) {
     println("tokenization..")
     for _, token := range tokens {
         println(token.ToString())
@@ -49,6 +52,7 @@ func printAstTree(node interface{}) {
     println(tree)
 }
 
+/*
 func getTree() *grammar.Expr {
 
     literalExpr := grammar.BuildLiteralExpr(
@@ -68,4 +72,4 @@ func getTree() *grammar.Expr {
 
     return binary
 }
-
+*/

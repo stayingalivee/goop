@@ -31,13 +31,12 @@ type Parser struct {
     index       int
 }
 
-func New(tokenList []Token) *Parser {
+func NewParser(tokenList []Token) *Parser {
     return &Parser{tokenList, 0}
 }
 
-func (parser *Parser) Parse() *Expr {
-    //TODO : call stuff
-    return nil
+func (self *Parser) Parse() *Expr {
+    return self.Expression()
 }
 
 // ----------------
@@ -45,7 +44,8 @@ func (parser *Parser) Parse() *Expr {
 // ----------------
 func (self *Parser) match(tokenTypeList ...TokenType) bool {
     for _, tokenType := range tokenTypeList {
-        if self.isAtEnd() && tokenType == self.peek().TokenType {
+        if !self.isAtEnd() && tokenType == self.peek().TokenType {
+
             self.next()
             return true
         }

@@ -1,18 +1,20 @@
 package scanner
 
-var keywords = map[string]TokenType{
-    "class":  CLASS,
-    "else":   ELSE,
-    "if":     IF,
-    "flase":  FALSE,
-    "true":   TRUE,
-    "for":    FOR,
-    "fun":    FUN,
-    "nil":    NIL,
-    "print":  PRINT,
-    "return": RETURN,
-    "super":  SUPER,
-    "this":   THIS,
-    "var":    VAR,
-    "while":  WHILE,
+import "goop/grammar"
+
+var keywords = map[string]grammar.TokenType{
+    "class":  grammar.CLASS,
+    "else":   grammar.ELSE,
+    "if":     grammar.IF,
+    "flase":  grammar.FALSE,
+    "true":   grammar.TRUE,
+    "for":    grammar.FOR,
+    "fun":    grammar.FUN,
+    "nil":    grammar.NIL,
+    "print":  grammar.PRINT,
+    "return": grammar.RETURN,
+    "super":  grammar.SUPER,
+    "this":   grammar.THIS,
+    "var":    grammar.VAR,
+    "while":  grammar.WHILE,
 }
