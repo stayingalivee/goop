@@ -37,22 +37,135 @@ func New(tokenList []Token) *Parser {
 
 func (parser *Parser) Parse() *Expr {
     //TODO : call stuff
+    return nil
 }
 
+// ----------------
+// parser controls
+// ----------------
 func (self *Parser) match(tokenTypeList ...TokenType) bool {
     for _, tokenType := range tokenTypeList {
-        if tokenType == self.tokenList[self.index].TokenType {
+        if self.isAtEnd() && tokenType == self.peek().TokenType {
+            self.next()
             return true
         }
     }
     return false
 }
 
-func (self *Parser) previous() {
-    //TODO: previous is used as if its returning an operator\
-    //but maybe we need to return a token instead.
+func (self *Parser) previous() *Token {
+    return &self.tokenList[self.index - 1]
 }
 
+func (self *Parser) next() *Token {
+    if !self.isAtEnd() {
+        self.index++
+    }
+    return self.previous()
+}
+
+func (self *Parser) isAtEnd() bool {
+    return self.peek().TokenType == EOF
+}
+
+func (self *Parser) peek() Token {
+    return self.tokenList[self.index]
+}
+
+// --------------------------
+// parser grammar rules impl
+// --------------------------
+
+// expression     → equality ;
+func (self *Parser) Expression() *Expr {
+    return self.Equality()
+}
+
+// equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+func (self *Parser) Equality() *Expr {
+    expr := self.Comparision()
+
+    for self.match(BANG_EQUAL, EQUAL_EQUAL) {
+        operator := &Operator{self.previous()}
+        right := self.Comparision()
+        expr = BuildBinaryExpr(expr, operator, right)
+    }
+    return expr
+}
+
+// comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+func (self *Parser) Comparision() *Expr {
+    expr := self.Term()
+
+    for self.match(LESS, LESS_EQUAL, GREATER, GREATER_EQUAL) {
+        operator := &Operator{self.previous()}
+        right := self.Term()
+        expr = BuildBinaryExpr(expr, operator, right)
+    }
+    return expr
+}
+
+// term           → factor ( ( "-" | "+" ) factor )* ;
+func (self *Parser) Term() *Expr {
+    expr := self.Factor()
+
+    for self.match(PLUS, MINUS) {
+        operator := &Operator{self.previous()}
+        right := self.Factor()
+        expr = BuildBinaryExpr(expr, operator, right)
+    }
+    return expr
+}
+
+
+// factor         → unary ( ( "/" | "*" ) unary )* ;
+func (self *Parser) Factor() *Expr {
+    expr := self.Unary()
+
+    for self.match(SLASH, STAR) {
+        operator := &Operator{self.previous()}
+        right := self.Unary()
+        expr = BuildBinaryExpr(expr, operator, right)
+    }
+    return expr
+}
+
+
+// unary          → ( "!" | "-" ) unary | primary ;
+func (self *Parser) Unary() *Expr {
+
+    if self.match(BANG, MINUS) {
+        operator := self.previous()
+        right := self.Unary()
+        expr := BuildUnaryExpr(operator, right)
+        return expr
+    }
+
+    return self.Primary()
+}
+
+// primary        → NUMBER | STRING | "true" | "false" | "nil"  | "(" expresion ")" ;
+func (self *Parser) Primary() *Expr {
+
+    if self.match(NUMBER, STRING, TRUE, FALSE, NIL) {
+        return BuildLiteralExpr(self.previous())
+    }
+
+    if self.match(LEFT_PAREN) {
+        expr := self.Expression()
+
+        // now a closing paranthesis is expected. otherwise it's syntax error
+        if self.match(RIGHT_PAREN) {
+            return BuildGroupingExpr(expr, self.peek().Line)
+        }
+    }
+
+    panic("syntax error")
+}
+
+// ---------------------------------------------------
+// code after parsing bill be a tree of below structs
+// ---------------------------------------------------
 type Expr struct{
     Literal     *Literal
     Unary       *Unary
@@ -85,7 +198,8 @@ type Operator struct{
     Token       *Token
 }
 
-
+// using builder functions cuz I genuinely hate typing up struct inits
+// inside other struct inits, it's ugly af like seriously super ugly
 func BuildLiteralExpr(token *Token) *Expr {
     return &Expr{Literal: &Literal{token}}
 }
@@ -106,35 +220,5 @@ func BuildGroupingExpr(expr *Expr, line int) *Expr {
 
 func NewOperator(token *Token) *Operator {
     return &Operator{Token: token}
-}
-
-
-// expression     → equality ;
-func (self *Parser) Expression() *Expr {
-    return self.Equality()
-}
-
-// equality       → comparison ( ( "!=" | "==" ) comparison )* ;
-func (self *Parser) Equality() *Expr {
-    expr := self.Comparision()
-
-    for self.match(BANG_EQUAL, EQUAL_EQUAL) {
-        opeartor := self.previous()
-        right := self.Comparision()
-        expr = BuildBinaryExpr(expr, operator, right)
-    }
-    return expr
-}
-
-// comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
-func (self *Parser) Comparision() *Expr {
-    expr := self.Term()
-
-    for self.match(LESS, LESS_EQUAL, GREATER, GREATER_EQUAL) {
-        operator := self.previous()
-        right := self.Term()
-        expr = BuildBinaryExpr(expr, operator, right)
-    }
-    return expr
 }
 
