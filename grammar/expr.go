@@ -125,7 +125,6 @@ func (self *Parser) Term() *Expr {
     return expr
 }
 
-
 // factor         → unary ( ( "/" | "*" ) unary )* ;
 func (self *Parser) Factor() *Expr {
     expr := self.Unary()
@@ -137,7 +136,6 @@ func (self *Parser) Factor() *Expr {
     }
     return expr
 }
-
 
 // unary          → ( "!" | "-" ) unary | primary ;
 func (self *Parser) Unary() *Expr {
@@ -171,9 +169,7 @@ func (self *Parser) Primary() *Expr {
     panic("syntax error")
 }
 
-// ---------------------------------------------------
-// code after parsing will be a tree of below structs
-// ---------------------------------------------------
+// expression data types
 type Expr struct{
     Literal     *Literal
     Unary       *Unary
