@@ -4,7 +4,6 @@ import (
     "fmt"
 	"io/ioutil"
     "os"
-    "goop/scanner"
     "goop/grammar"
 )
 
@@ -16,18 +15,10 @@ func main() {
 }
 
 func run(sourcePath string) {
-    content := readSource(sourcePath)
-
-    println("source code")
-    println(string(content))
-    scnr := scanner.Scanner{SourceCode: string(content)}
-    tokens := scnr.ScanTokens()
-
-    println("token scanning ...")
-    // printDebug(tokens)
+    source := readSource(sourcePath)
 
     println("parsing...")
-    parser := grammar.NewParser(tokens)
+    parser := grammar.NewParser(string(source))
     parser.Parse()
 }
 

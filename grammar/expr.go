@@ -1,6 +1,5 @@
 package grammar
 
-
 /*
 Recursive descent is considered a top-down parser because it starts from the
 top or outermost grammar rule (here  expression) and works its way down
@@ -31,7 +30,9 @@ type Parser struct {
     index       int
 }
 
-func NewParser(tokenList []Token) *Parser {
+func NewParser(source string) *Parser {
+    scnr := Scanner{SourceCode: string(source)}
+    tokenList := scnr.ScanTokens()
     return &Parser{tokenList, 0}
 }
 

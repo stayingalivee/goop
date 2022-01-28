@@ -1,22 +1,22 @@
-package scanner
+package grammar
 
 import "os"
-import "goop/grammar"
+
 var start = 0
 var current = 0
 var line = 1
 
 type Scanner struct {
     SourceCode      string
-    tokens          []grammar.Token
+    tokens          []Token
 }
 
-func (self *Scanner) ScanTokens() []grammar.Token {
+func (self *Scanner) ScanTokens() []Token {
     for !self.isAtEnd() {
         start = current;
         self.scanToken()
     }
-    EOFToken := grammar.Token{grammar.EOF, "", "", line}
+    EOFToken := Token{EOF, "", "", line}
     self.tokens = append(self.tokens, EOFToken)
     return self.tokens
 }
@@ -24,19 +24,19 @@ func (self *Scanner) ScanTokens() []grammar.Token {
 func (self *Scanner) scanToken() {
     c := self.next()
     switch  {
-        case c == '(': self.addToken(grammar.LEFT_PAREN)
-        case c == ')': self.addToken(grammar.RIGHT_PAREN)
-        case c == '{': self.addToken(grammar.LEFT_BRACE)
-        case c == '}': self.addToken(grammar.RIGHT_BRACE)
-        case c == ',': self.addToken(grammar.COMMA)
-        case c == '-': self.addToken(grammar.MINUS)
-        case c == '+': self.addToken(grammar.PLUS)
-        case c == ';': self.addToken(grammar.SEMICOLON)
-        case c == '*': self.addToken(grammar.STAR)
-        case c == '!': self.addTokenOnCondition(self.matchNext('='), grammar.BANG_EQUAL, grammar.BANG)
-        case c == '=': self.addTokenOnCondition(self.matchNext('='), grammar.EQUAL_EQUAL, grammar.EQUAL)
-        case c == '>': self.addTokenOnCondition(self.matchNext('='), grammar.GREATER_EQUAL, grammar.GREATER)
-        case c == '<': self.addTokenOnCondition(self.matchNext('='), grammar.LESS_EQUAL, grammar.LESS)
+        case c == '(': self.addToken(LEFT_PAREN)
+        case c == ')': self.addToken(RIGHT_PAREN)
+        case c == '{': self.addToken(LEFT_BRACE)
+        case c == '}': self.addToken(RIGHT_BRACE)
+        case c == ',': self.addToken(COMMA)
+        case c == '-': self.addToken(MINUS)
+        case c == '+': self.addToken(PLUS)
+        case c == ';': self.addToken(SEMICOLON)
+        case c == '*': self.addToken(STAR)
+        case c == '!': self.addTokenOnCondition(self.matchNext('='), BANG_EQUAL, BANG)
+        case c == '=': self.addTokenOnCondition(self.matchNext('='), EQUAL_EQUAL, EQUAL)
+        case c == '>': self.addTokenOnCondition(self.matchNext('='), GREATER_EQUAL, GREATER)
+        case c == '<': self.addTokenOnCondition(self.matchNext('='), LESS_EQUAL, LESS)
         case c == ' ':  // ignore all whitespaces 
         case c == '\t':
         case c == '\r':
@@ -45,7 +45,7 @@ func (self *Scanner) scanToken() {
             if self.isNumeric(self.peek()) {
                 self.handleNumber()
             } else {
-                self.addToken(grammar.DOT)
+                self.addToken(DOT)
             }
         case c == '/':
             if self.matchNext('/') {
@@ -53,15 +53,15 @@ func (self *Scanner) scanToken() {
                     self.next()
                 }
             } else {
-                self.addToken(grammar.SLASH)
+                self.addToken(SLASH)
             }
         case c == '|':
             if self.matchNext('|') {
-                self.addToken(grammar.OR)
+                self.addToken(OR)
             }
         case c== '&':
             if self.matchNext('&') {
-                self.addToken(grammar.AND)
+                self.addToken(AND)
             }
         case c == '"': self.handleString()
         case self.isNumeric(c): self.handleNumber()
@@ -79,13 +79,13 @@ func (self *Scanner) scanToken() {
 
 func (self *Scanner) addToken(params ...interface{}) {
     var literal string = ""
-    tokenType := params[0].(grammar.TokenType)
+    tokenType := params[0].(TokenType)
 
     if  len(params) > 1 {
         literal = params[1].(string)
     }
 
-    token := grammar.Token{
+    token := Token{
         TokenType: tokenType,
         Lexeme: self.SourceCode[start:current],
         Literal: literal,
@@ -95,7 +95,7 @@ func (self *Scanner) addToken(params ...interface{}) {
 }
 
 func (self *Scanner) addTokenOnCondition(
-    condition bool, ifTrue grammar.TokenType, ifFalse grammar.TokenType) {
+    condition bool, ifTrue TokenType, ifFalse TokenType) {
     if condition {
         self.addToken(ifTrue)
     } else {
@@ -140,7 +140,7 @@ func (self *Scanner) handleString() {
     }
     self.next()
     literal := self.SourceCode[start + 1: current - 1]
-    self.addToken(grammar.STRING, literal)
+    self.addToken(STRING, literal)
 }
 
 var dotCount = 0;
@@ -161,7 +161,7 @@ func (self *Scanner) handleNumber() {
     }
     dotCount = 0
     literal := self.SourceCode[start: current]
-    self.addToken(grammar.NUMBER, literal)
+    self.addToken(NUMBER, literal)
 }
 
 func (self *Scanner) handleIdentifier() {
@@ -175,7 +175,7 @@ func (self *Scanner) handleIdentifier() {
     if exists {
         self.addToken(tokenType)
     } else {
-        self.addToken(grammar.IDENTIFIER)
+        self.addToken(IDENTIFIER)
     }
 }
 
