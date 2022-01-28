@@ -35,8 +35,13 @@ func NewParser(tokenList []Token) *Parser {
     return &Parser{tokenList, 0}
 }
 
-func (self *Parser) Parse() *Expr {
-    return self.Expression()
+func (self *Parser) Parse() {
+    for !self.isAtEnd() {
+        expr := self.Expression()
+        tree := ""
+        PrintTree(expr, &tree)
+        println(tree)
+    }
 }
 
 // ----------------

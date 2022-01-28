@@ -18,16 +18,17 @@ func main() {
 func run(sourcePath string) {
     content := readSource(sourcePath)
 
+    println("source code")
+    println(string(content))
     scnr := scanner.Scanner{SourceCode: string(content)}
     tokens := scnr.ScanTokens()
 
     println("token scanning ...")
-    printDebug(tokens)
+    // printDebug(tokens)
 
     println("parsing...")
     parser := grammar.NewParser(tokens)
-    tree := parser.Parse()
-    printAstTree(tree)
+    parser.Parse()
 }
 
 func readSource(sourceCodePath string) []byte {
