@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
     "os"
     "goop/grammar"
+    "goop/interpreter"
 )
 
 func main() {
@@ -19,7 +20,9 @@ func run(sourcePath string) {
 
     println("parsing...")
     parser := grammar.NewParser(string(source))
-    parser.Parse()
+    expr := parser.Parse()
+    result := interpreter.Evaluate(expr)
+    println(result.(string))
 }
 
 func readSource(sourceCodePath string) []byte {
@@ -30,38 +33,3 @@ func readSource(sourceCodePath string) []byte {
     return content
 }
 
-func printDebug(tokens []grammar.Token) {
-    println("tokenization..")
-    for _, token := range tokens {
-        println(token.ToString())
-    }
-}
-
-func printAstTree(node interface{}) {
-    println("printing ast")
-    tree := ""
-    grammar.PrintTree(node, &tree)
-    println(tree)
-}
-
-/*
-func getTree() *grammar.Expr {
-
-    literalExpr := grammar.BuildLiteralExpr(
-        scanner.NewToken(scanner.NUMBER, "123", "", 1))
-    unaryExpr := grammar.BuildUnaryExpr(
-        scanner.NewToken(scanner.MINUS, "-", "", 1),
-        literalExpr,
-    )
-
-    star := grammar.NewOperator(scanner.NewToken(scanner.STAR, "*", "", 1))
-
-    groupedExpr := grammar.BuildLiteralExpr(scanner.NewToken(scanner.NUMBER, "13.21", "", 1))
-    grouping := grammar.BuildGroupingExpr(groupedExpr, 1)
-
-    binary := grammar.BuildBinaryExpr(unaryExpr, star, grouping)
-    //                                  -123      *     (13.21)
-
-    return binary
-}
-*/

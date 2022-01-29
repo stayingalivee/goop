@@ -31,18 +31,18 @@ type Parser struct {
 }
 
 func NewParser(source string) *Parser {
-    scnr := Scanner{SourceCode: string(source)}
+    scnr := Scanner{SourceCode: source}
     tokenList := scnr.ScanTokens()
     return &Parser{tokenList, 0}
 }
 
-func (self *Parser) Parse() {
-    for !self.isAtEnd() {
+func (self *Parser) Parse() *Expr {
         expr := self.Expression()
         tree := ""
         PrintTree(expr, &tree)
         println(tree)
-    }
+
+        return expr
 }
 
 // ----------------
