@@ -5,7 +5,7 @@ var keywords = map[string]TokenType{
     "class":  CLASS,
     "else":   ELSE,
     "if":     IF,
-    "flase":  FALSE,
+    "false":  FALSE,
     "true":   TRUE,
     "for":    FOR,
     "fun":    FUN,
