@@ -23,6 +23,7 @@ primary        → NUMBER | STRING | "true" | "false" | "nil"
     .
     .
     .
+    TODO: add logical operation parsing
 */
 
 type Parser struct {
