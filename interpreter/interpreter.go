@@ -6,20 +6,18 @@ import (
 	"strconv"
 )
 
-// -1
-
-
 func Evaluate(expr *grammar.Expr) interface{} {
 
     if expr.Literal != nil {
-            return handleLiteral(expr.Literal)
+        return handleLiteral(expr.Literal)
     } else if expr.Unary != nil {
-            return handleUnary(expr.Unary)
+        return handleUnary(expr.Unary)
     } else if expr.Binary != nil {
-            return handleBinary(expr.Binary)
+        return handleBinary(expr.Binary)
     } else if expr.Grouping != nil {
-            return handleGrouping(expr.Grouping)
+        return handleGrouping(expr.Grouping)
     }
+
     // unreachable code
     panic("you should not see this error")
 }
@@ -29,58 +27,49 @@ func handleLiteral(literal *grammar.Literal) string {
 }
 
 func handleUnary(unary *grammar.Unary) interface{} {
+
+    evalUnary := Evaluate(unary.Expr).(string)
     switch unary.Token.TokenType {
         case grammar.MINUS:
-            result, err := strconv.Atoi(Evaluate(unary.Expr).(string))
-            if err!= nil {
-                return -result
-            }
+            result, _ := strconv.Atoi(evalUnary)
+            return -result
         case grammar.BANG:
-            result, err := strconv.ParseBool(Evaluate(unary.Expr).(string))
-            if err!= nil {
-                return !result
-            }
+            result, _ := strconv.ParseBool(evalUnary)
+            return !result
     }
-    panic("panic lan")
+    // unreachable code
+    panic("you should not see this error")
 }
 
 func handleBinary(binary *grammar.Binary) interface{} {
 
-
     switch binary.Operator.Token.TokenType {
-        case grammar.MINUS:
-            fallthrough
-        case grammar.PLUS:
-            fallthrough
-        case grammar.STAR:
-            fallthrough
-        case grammar.SLASH:
-            return handleArithmaticBinary(binary)
-        case grammar.AND:
-            fallthrough
-        case grammar.OR:
+
+        case grammar.MINUS,
+             grammar.PLUS,
+             grammar.STAR,
+             grammar.SLASH:
+            return handleArithmeticBinary(binary)
+
+        case grammar.AND,
+             grammar.OR:
             return handleLogicalBinary(binary)
-        case grammar.EQUAL:
-            fallthrough
-        case grammar.BANG_EQUAL:
-            fallthrough
-        case grammar.LESS:
-            fallthrough
-        case grammar.LESS_EQUAL:
-            fallthrough
-        case grammar.GREATER:
-            fallthrough
-        case grammar.GREATER_EQUAL:
+
+        case grammar.EQUAL,
+             grammar.BANG_EQUAL,
+             grammar.LESS,
+             grammar.LESS_EQUAL,
+             grammar.GREATER,
+             grammar.GREATER_EQUAL:
             return handleComparisionBinary(binary)
     }
-    panic("panic lan")
+    // unreachable code
+    panic("you should not see this error")
 }
 
-func handleArithmaticBinary(binary *grammar.Binary) string{
+func handleArithmeticBinary(binary *grammar.Binary) string {
     left, _ := strconv.Atoi(Evaluate(binary.Left).(string))
     right, _ :=strconv.Atoi(Evaluate(binary.Right).(string))
-    println(left)
-    println(right)
 
     switch binary.Operator.Token.TokenType {
         case grammar.MINUS:
@@ -92,7 +81,7 @@ func handleArithmaticBinary(binary *grammar.Binary) string{
         case grammar.SLASH:
             return fmt.Sprint(left / right)
     }
-    panic("arithmatic error")
+    panic("arithmetic error")
 }
 
 func handleLogicalBinary(binary *grammar.Binary) bool {
