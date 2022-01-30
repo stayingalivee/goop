@@ -63,6 +63,7 @@ func handleBinary(binary *grammar.Binary) interface{} {
              grammar.GREATER_EQUAL:
             return handleComparisionBinary(binary)
     }
+
     // unreachable code
     panic("you should not see this error")
 }
@@ -84,36 +85,41 @@ func handleArithmeticBinary(binary *grammar.Binary) string {
     panic("arithmetic error")
 }
 
-func handleLogicalBinary(binary *grammar.Binary) bool {
+func handleLogicalBinary(binary *grammar.Binary) string {
     left, _ := strconv.ParseBool(Evaluate(binary.Left).(string))
     right, _ :=strconv.ParseBool(Evaluate(binary.Right).(string))
+    println("left")
+    println(left)
+    println("right")
+    println(right)
 
     switch binary.Operator.Token.TokenType {
         case grammar.AND:
-            return left && right
+            return fmt.Sprint(left && right)
         case grammar.OR:
-            return left || right
+            return fmt.Sprint(left || right)
     }
     panic("bool error")
 }
 
-func handleComparisionBinary(binary *grammar.Binary) bool {
+func handleComparisionBinary(binary *grammar.Binary) string {
+
     left, _ := strconv.Atoi(Evaluate(binary.Left).(string))
     right, _ :=strconv.Atoi(Evaluate(binary.Right).(string))
 
     switch binary.Operator.Token.TokenType {
         case grammar.EQUAL:
-            return left == right
+            return fmt.Sprint(left == right)
         case grammar.BANG_EQUAL:
-            return left != right
+            return fmt.Sprint(left != right)
         case grammar.LESS:
-            return left < right
+            return fmt.Sprint(left < right)
         case grammar.LESS_EQUAL:
-            return left <= right
+            return fmt.Sprint(left <= right)
         case grammar.GREATER:
-            return left > right
+            return fmt.Sprint(left > right)
         case grammar.GREATER_EQUAL:
-            return left >= right
+            return fmt.Sprint(left >= right)
     }
     panic("comparision error")
 }

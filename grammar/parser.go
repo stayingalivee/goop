@@ -33,6 +33,12 @@ type Parser struct {
 func NewParser(source string) *Parser {
     scnr := Scanner{SourceCode: source}
     tokenList := scnr.ScanTokens()
+
+    println("\ntoken list:")
+    for _, token := range tokenList {
+        println("\t" + token.TokenType.String())
+    }
+
     return &Parser{tokenList, 0}
 }
 
@@ -40,7 +46,8 @@ func (self *Parser) Parse() *Expr {
         expr := self.Expression()
         tree := ""
         PrintTree(expr, &tree)
-        println(tree)
+        println("\ntree:")
+        println("\t" + tree)
 
         return expr
 }
